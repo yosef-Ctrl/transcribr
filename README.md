@@ -1,12 +1,18 @@
 # transcribr
 
-- paste secret API key, the endpoint's health should pop up automatically
+## quick start
 
-- paste link to episode from Apple Podcasts, the podcast image, details, and owner should appear
+- paste secret API key. Endpoint health should pop up automatically
 
-- press button to Transcribe. Wait a few minutes
+- paste Apple Podcasts link to episode. Podcast logo, details, and owner should appear
 
-- press button to Copy raw text, paste into GPT chat and ask it to split out the speakers. Raw data includes timestamps, so it is useful to also paste in any chapter markers from the podcast manifest
+- press button to Transcribe. Wait ~1 minute for 60 minutes of audio
+
+- press button to Copy raw text. Paste into GPT chat and ask it to split out the speakers. The raw data includes timestamps; it is useful to paste chapter markers from the podcast description
+
+## longer blog post
+
+Workflow described [here](https://artlu.bearblog.dev/fast-following-for-95-power-and-5-cost/) as well as a useful prompt to generate pleasant, human-readable transcripts.
 
 ## development
 
