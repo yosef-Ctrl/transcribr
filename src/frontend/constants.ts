@@ -6,7 +6,8 @@ export enum Themes {
 }
 
 export type PodcastMetadata = {
-    name: string;
+    podcastName: string;
+    episodeName: string;
     date: string;
     description: string;
     previewImageUrl: string | null;

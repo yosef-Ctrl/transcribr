@@ -8,8 +8,8 @@ export const Landing = () => {
 		<div className="flex justify-center">
 			<article className="prose dark:prose-invert">
 				<div className="flex flex-col gap-4">
-					<PodcastTranscript />
 					<PodcastUpload />
+					<PodcastTranscript />
 					<JobsQueue />
 					<ApiInputs />
 				</div>

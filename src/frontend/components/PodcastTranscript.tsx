@@ -122,7 +122,7 @@ export const PodcastTranscript = () => {
 
 							<div>
 								<h4 className="font-medium">Name:</h4>
-								<p className="text-sm opacity-80">{podcastMetadata.name}</p>
+								<p className="text-sm opacity-80">{podcastMetadata.podcastName}</p>
 							</div>
 
 							<div>
@@ -133,8 +133,8 @@ export const PodcastTranscript = () => {
 							<div>
 								<h4 className="font-medium">Description:</h4>
 								<p className="text-sm opacity-80 whitespace-pre-wrap">
-									{podcastMetadata.description.slice(0, 500)}
-									{podcastMetadata.description.length >= 500 && "..."}
+									{podcastMetadata.description.slice(0, 1000)}
+									{podcastMetadata.description.length >= 1000 && "..."}
 								</p>
 							</div>
 						</div>

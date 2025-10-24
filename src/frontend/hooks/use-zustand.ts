@@ -11,7 +11,8 @@ export const useZustand = create(
 				runpodApiKey: null as string | null,
 				podcastUrl: null as string | null,
 				podcastMetadata: null as {
-					name: string;
+					podcastName: string;
+					episodeName: string;
 					date: string;
 					description: string;
 					previewImageUrl: string | null;

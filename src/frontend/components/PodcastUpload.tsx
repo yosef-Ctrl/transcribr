@@ -1,8 +1,15 @@
-import type { iTunesResponse, iTunesResult, WhisperTranscriptionResult } from "@shared/types";
+import type {
+	iTunesResponse,
+	iTunesResult,
+	MarkAsSeenRequest,
+	MarkAsSeenResponse,
+	WhisperTranscriptionResult,
+} from "@shared/types";
 import { fetcher } from "itty-fetcher";
 import { debounce } from "radash";
 import { useEffect, useState } from "react";
 import { CHATTY_PODCAST_PARSING, type PodcastMetadata } from "~/constants";
+import { useMarkAsSeenMutation } from "~/hooks/queries/usePodcastQueries";
 import { useZustand } from "~/hooks/use-zustand";
 
 const api = fetcher({ base: "/api" });
@@ -14,13 +21,16 @@ const checkCachedTranscript = async (
 	wordTimestamps: boolean = true,
 ): Promise<WhisperTranscriptionResult | null> => {
 	try {
-		CHATTY_PODCAST_PARSING && console.log("🔍 Checking cache for audio URL:", audioUrl);
+		CHATTY_PODCAST_PARSING &&
+			console.log("🔍 Checking cache for audio URL:", audioUrl);
 
 		const response = await api.get<{
 			cached: boolean;
 			result?: WhisperTranscriptionResult;
 			cacheKey?: string;
-		}>(`/cache/check?url=${encodeURIComponent(audioUrl)}&model=${model}&word_timestamps=${wordTimestamps}`);
+		}>(
+			`/cache/check?url=${encodeURIComponent(audioUrl)}&model=${model}&word_timestamps=${wordTimestamps}`,
+		);
 
 		CHATTY_PODCAST_PARSING && console.log("📊 Cache check response:", response);
 
@@ -40,7 +50,11 @@ const checkCachedTranscript = async (
 // Function to parse Apple Podcasts URL and extract metadata
 const parseApplePodcastUrl = async (
 	url: string,
-): Promise<{ metadata: PodcastMetadata; cachedTranscript: WhisperTranscriptionResult | null } | null> => {
+	markAsSeen: (request: MarkAsSeenRequest) => Promise<MarkAsSeenResponse>,
+): Promise<{
+	metadata: PodcastMetadata;
+	cachedTranscript: WhisperTranscriptionResult | null;
+} | null> => {
 	try {
 		CHATTY_PODCAST_PARSING && console.log("🔍 Parsing URL:", url);
 
@@ -63,6 +77,7 @@ const parseApplePodcastUrl = async (
 
 		// Try multiple approaches to get episode data
 		let episode = null;
+		let podcastData: iTunesResponse | null = null;
 
 		// Approach 1: Try to get episode directly by episode ID
 		if (episodeId) {
@@ -74,14 +89,14 @@ const parseApplePodcastUrl = async (
 				);
 			}
 
-			const episodeData = await api.get<iTunesResponse>(
-				`/itunes/lookup?id=${episodeId}&entity=podcastEpisode`,
+			podcastData = await api.get<iTunesResponse>(
+				`/itunes/lookup?id=${episodeId}&entity=podcastEpisode&url=${url}`,
 			);
 			CHATTY_PODCAST_PARSING &&
-				console.log("📊 Episode API Response data:", episodeData);
+				console.log("📊 Episode API Response data:", podcastData);
 
-			if (episodeData.resultCount > 0) {
-				episode = episodeData.results[0];
+			if (podcastData.resultCount > 0) {
+				episode = podcastData.results[0];
 				CHATTY_PODCAST_PARSING &&
 					console.log("✅ Found episode via direct lookup:", episode);
 			}
@@ -100,7 +115,7 @@ const parseApplePodcastUrl = async (
 			const res = await api.get<string>(
 				`/itunes/lookup?id=${podcastId}&entity=podcast`,
 			);
-			const podcastData = await JSON.parse(res) as iTunesResponse;
+			podcastData = (await JSON.parse(res)) as iTunesResponse;
 			CHATTY_PODCAST_PARSING &&
 				console.log("📊 Podcast API Response data:", podcastData);
 
@@ -119,14 +134,17 @@ const parseApplePodcastUrl = async (
 					const res = await api.get<string>(
 						`/itunes/lookup?id=${podcastId}&entity=podcastEpisode`,
 					);
-					const episodesData = await JSON.parse(res) as iTunesResponse;
+					const episodesData = (await JSON.parse(res)) as iTunesResponse;
 					CHATTY_PODCAST_PARSING &&
 						console.log("📊 Episodes API Response data:", episodesData);
 
 					if (episodesData.resultCount > 0) {
 						// Search for the specific episode
 						CHATTY_PODCAST_PARSING &&
-							console.log("🔍 Searching for episode in podcast episodes list:", episodeId);
+							console.log(
+								"🔍 Searching for episode in podcast episodes list:",
+								episodeId,
+							);
 						episode = episodesData.results.find(
 							(ep: iTunesResult) => ep.trackId.toString() === episodeId,
 						);
@@ -150,7 +168,8 @@ const parseApplePodcastUrl = async (
 		CHATTY_PODCAST_PARSING && console.log("🔄 Episode:", episode);
 
 		const metadata: PodcastMetadata = {
-			name: episode.trackName || "Unknown Title",
+			podcastName: episode.collectionName || "Unknown Podcast",
+			episodeName: episode.trackName || "Unknown Title",
 			date: episode.releaseDate
 				? new Date(episode.releaseDate).toLocaleDateString()
 				: "Unknown Date",
@@ -162,6 +181,21 @@ const parseApplePodcastUrl = async (
 		};
 
 		CHATTY_PODCAST_PARSING && console.log("✅ Parsed metadata:", metadata);
+
+		// if episode URL available, mark as seen
+		if (
+			episode.episodeUrl &&
+			markAsSeen &&
+			(!podcastData || podcastData.source !== "cached database")
+		) {
+			const response = await markAsSeen({
+				episodeUrl: url,
+				iTunesResult: episode,
+			});
+			if (!response.success) {
+				throw new Error(response.error ?? "Failed to mark episode as seen");
+			}
+		}
 
 		// Check for cached transcript as soon as we have the audio URL
 		let cachedTranscript: WhisperTranscriptionResult | null = null;
@@ -177,12 +211,19 @@ const parseApplePodcastUrl = async (
 };
 
 export const PodcastUpload = () => {
-	const { podcastUrl, setPodcastUrl, setPodcastMetadata, setTranscriptionResult } = useZustand();
+	const {
+		podcastUrl,
+		setPodcastUrl,
+		setPodcastMetadata,
+		setTranscriptionResult,
+	} = useZustand();
 
 	// Local state for form inputs
 	const [podcastUrlInput, setPodcastUrlInput] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
+
+	const { mutateAsync: markAsSeen } = useMarkAsSeenMutation();
 
 	// Initialize endpoint input with existing Zustand value (if any)
 	useEffect(() => {
@@ -202,13 +243,15 @@ export const PodcastUpload = () => {
 			if (value?.includes("podcasts.apple.com")) {
 				setIsLoading(true);
 				try {
-					const result = await parseApplePodcastUrl(value);
+					const result = await parseApplePodcastUrl(value, markAsSeen);
 					if (result) {
 						setPodcastMetadata(result.metadata);
 
 						// If we found a cached transcript, set it immediately
 						if (result.cachedTranscript) {
-							console.log("🎉 Found cached transcript, setting it immediately!");
+							console.log(
+								"🎉 Found cached transcript, setting it immediately!",
+							);
 							setTranscriptionResult(result.cachedTranscript);
 						}
 					} else {
@@ -233,7 +276,7 @@ export const PodcastUpload = () => {
 	// Handle input changes with debounced auto-save
 	const handlePodcastUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value.trim(); // Trim whitespace
-		console.log("📝 Input changed to:", value);
+		setTranscriptionResult(null);
 		setPodcastUrlInput(value);
 		debouncedSetPodcastUrl(value);
 	};
@@ -244,7 +287,7 @@ export const PodcastUpload = () => {
 			setError(null);
 			setIsLoading(true);
 			try {
-				const result = await parseApplePodcastUrl(podcastUrlInput);
+				const result = await parseApplePodcastUrl(podcastUrlInput, markAsSeen);
 				if (result) {
 					setPodcastMetadata(result.metadata);
 
@@ -256,6 +299,7 @@ export const PodcastUpload = () => {
 				} else {
 					setError("Episode not found. Please check the URL and try again.");
 					setPodcastMetadata(null);
+					setTranscriptionResult(null);
 				}
 			} catch (error) {
 				console.error("Failed to parse podcast metadata:", error);
@@ -263,6 +307,7 @@ export const PodcastUpload = () => {
 					"Failed to load episode metadata. Please check the URL and try again.",
 				);
 				setPodcastMetadata(null);
+				setTranscriptionResult(null);
 			} finally {
 				setIsLoading(false);
 			}
@@ -277,7 +322,16 @@ export const PodcastUpload = () => {
 				{/* Podcast URL Input */}
 				<div className="form-control w-full">
 					<label htmlFor="podcast-url-input" className="label">
-						<span className="label-text">Apple Podcasts URL</span>
+						<span className="label-text">
+							<a
+								href="https://podcasts.apple.com/us/podcast/bitcoin-core-vs-knots-why-developers-are-fighting-over/id1123922160?i=1000730634660"
+								target="_blank"
+								rel="noopener noreferrer"
+							>
+								Apple Podcasts
+							</a>{" "}
+							URL
+						</span>
 					</label>
 					<div className="join w-full">
 						<input

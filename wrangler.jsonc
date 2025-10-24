@@ -2,23 +2,30 @@
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "transcribr",
 	"main": "src/backend/index.ts",
-	"compatibility_date": "2025-10-08",
+	"compatibility_date": "2025-10-11",
 	"vars": {
 		"NAME": "transcribr",
 		"RUNPOD_ENDPOINT": "https://api.runpod.ai/v2/afefikfwd5fqmr"
 	},
 	"kv_namespaces": [
 		{
-			"binding": "WHISPERX_JOBS",
+			"binding": "WHISPER_JOBS",
 			"id": "e972b86a523f4e799b56967c6ec9cf84",
 			"remote": true
 		}
 	],
-
 	"r2_buckets": [
 		{
 			"binding": "R2",
 			"bucket_name": "transcribr",
+			"remote": true
+		}
+	],
+	"d1_databases": [
+		{
+			"binding": "D1",
+			"database_name": "transcribr",
+			"database_id": "ea114662-4f4b-451e-808b-67c3762f8284",
 			"remote": true
 		}
 	],
